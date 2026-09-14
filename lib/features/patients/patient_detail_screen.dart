@@ -14,6 +14,7 @@ import 'package:nodex_hms/core/errors/nodex_error.dart';
 import 'package:nodex_hms/domain/patients/patient.dart';
 import 'package:nodex_hms/domain/session/session_state.dart';
 import 'package:nodex_hms/features/encounters/encounter_list_section.dart';
+import 'package:nodex_hms/features/laboratory/lab_patient_section.dart';
 import 'package:nodex_hms/features/patients/patients_controller.dart';
 import 'package:nodex_hms/features/session/session_controller.dart';
 
@@ -177,6 +178,8 @@ class _DetailBody extends ConsumerWidget {
           ),
         const SizedBox(height: 16),
         EncounterListSection(patient: bundle.patient),
+        const SizedBox(height: 16),
+        LabPatientSection(patientId: bundle.patient.id),
       ],
     );
   }

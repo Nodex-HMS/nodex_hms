@@ -133,7 +133,7 @@ Next on this path: `device_id` in the mutations ledger (connector currently
 sends null) and a real SHA-256 `payload_digest` instead of the idempotency-key
 placeholder.
 
-### 3. First clinical modules (MPI, encounters and laboratory foundation landed)
+### 3. First clinical modules (MPI, encounters and laboratory vertical slice landed)
 
 **Master Patient Index (module 10)** and **Longitudinal EMR encounters
 (module 16)** are implemented as reference vertical slices: Postgres schema
@@ -141,8 +141,9 @@ with RLS, PowerSync local schema, repository with test seam, `*.write`-gated
 use cases, screens, field-level merge (MPI) and signature-gated freeze with
 append-only amendments (encounters), and the laboratory state machine (order ->
 specimen -> entered result -> verified/corrected). All clinical tables are
-registered in the mutation-handler allowlist, and local schema/repository/use-
-case tests are present.
+registered in the mutation-handler allowlist, local schema/repositories/use-
+case tests are present, and the patient detail UI now links to encounter and
+laboratory workflows.
 
 Handbook deviations applied while building it (all deliberate, all documented
 in the migration headers):
@@ -153,11 +154,9 @@ in the migration headers):
 - Registry `mergeableFields` corrected to real column names (`phone_number`,
   not `phone`); six contact columns added to match
 
-Next module: finish the Laboratory UI (patient detail lab section, order detail,
-barcode collection and result verification), then build prescriptions/pharmacy
-(25) or appointments (07). The laboratory backend and domain foundation are
-already in place; the UI remains next so the whole state machine is exercised
-end to end.
+Next module: prescriptions/pharmacy (25) or appointments (07). The laboratory
+vertical slice is complete at the code level; hardware barcode scanning,
+PowerSync device verification and clinical deployment validation remain.
 
 ---
 

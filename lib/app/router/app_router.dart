@@ -22,6 +22,7 @@ import 'package:nodex_hms/features/auth/sign_in_screen.dart';
 import 'package:nodex_hms/features/diagnostics/sync_diagnostics_screen.dart';
 import 'package:nodex_hms/features/encounters/encounter_editor_screen.dart';
 import 'package:nodex_hms/features/home/home_screen.dart';
+import 'package:nodex_hms/features/laboratory/lab_order_screen.dart';
 import 'package:nodex_hms/features/module_placeholder/module_placeholder_screen.dart';
 import 'package:nodex_hms/features/patients/patient_detail_screen.dart';
 import 'package:nodex_hms/features/patients/patient_search_screen.dart';
@@ -162,6 +163,13 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                     builder: (BuildContext context, GoRouterState state) =>
                         EncounterEditorScreen(
                           encounterId: state.pathParameters['encounterId']!,
+                        ),
+                  ),
+                  GoRoute(
+                    path: 'lab/:orderId',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        LabOrderScreen(
+                          orderId: state.pathParameters['orderId']!,
                         ),
                   ),
                 ],
