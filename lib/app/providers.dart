@@ -21,6 +21,8 @@ import 'package:nodex_hms/data/local/local_database.dart';
 import 'package:nodex_hms/data/remote/supabase_gateway.dart';
 import 'package:nodex_hms/domain/encounters/encounter_repository.dart';
 import 'package:nodex_hms/domain/encounters/encounter_use_cases.dart';
+import 'package:nodex_hms/domain/laboratory/lab_repository.dart';
+import 'package:nodex_hms/domain/laboratory/lab_use_cases.dart';
 import 'package:nodex_hms/domain/patients/patient_repository.dart';
 import 'package:nodex_hms/domain/patients/patient_use_cases.dart';
 import 'package:nodex_hms/domain/session/session_repository.dart';
@@ -201,6 +203,56 @@ final Provider<AmendEncounterUseCase> amendEncounterUseCaseProvider =
       (Ref ref) => AmendEncounterUseCase(
         repository: ref.watch(encounterRepositoryProvider),
       ),
+    );
+
+/// Laboratory repository over the encrypted local projection.
+final Provider<LabRepository> labRepositoryProvider = Provider<LabRepository>(
+  (Ref ref) => DefaultLabRepository(
+    store: PowerSyncPatientStore(database: ref.watch(localDatabaseProvider)),
+    logger: ref.watch(loggerProvider),
+  ),
+);
+
+/// Laboratory order creation.
+final Provider<CreateLabOrderUseCase> createLabOrderUseCaseProvider =
+    Provider<CreateLabOrderUseCase>(
+      (Ref ref) =>
+          CreateLabOrderUseCase(repository: ref.watch(labRepositoryProvider)),
+    );
+
+/// Specimen registration.
+final Provider<RegisterSpecimenUseCase> registerSpecimenUseCaseProvider =
+    Provider<RegisterSpecimenUseCase>(
+      (Ref ref) =>
+          RegisterSpecimenUseCase(repository: ref.watch(labRepositoryProvider)),
+    );
+
+/// Specimen collection.
+final Provider<CollectSpecimenUseCase> collectSpecimenUseCaseProvider =
+    Provider<CollectSpecimenUseCase>(
+      (Ref ref) =>
+          CollectSpecimenUseCase(repository: ref.watch(labRepositoryProvider)),
+    );
+
+/// Laboratory result entry.
+final Provider<EnterLabResultUseCase> enterLabResultUseCaseProvider =
+    Provider<EnterLabResultUseCase>(
+      (Ref ref) =>
+          EnterLabResultUseCase(repository: ref.watch(labRepositoryProvider)),
+    );
+
+/// Laboratory result verification.
+final Provider<VerifyLabResultUseCase> verifyLabResultUseCaseProvider =
+    Provider<VerifyLabResultUseCase>(
+      (Ref ref) =>
+          VerifyLabResultUseCase(repository: ref.watch(labRepositoryProvider)),
+    );
+
+/// Laboratory result correction.
+final Provider<CorrectLabResultUseCase> correctLabResultUseCaseProvider =
+    Provider<CorrectLabResultUseCase>(
+      (Ref ref) =>
+          CorrectLabResultUseCase(repository: ref.watch(labRepositoryProvider)),
     );
 
 /// AI model and routing configuration.

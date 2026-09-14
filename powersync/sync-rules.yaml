@@ -141,3 +141,25 @@ sync_rules:
           join public.clinical_encounters e on e.id = am.encounter_id
           join public.patients p on p.id = e.patient_id
           where p.tenant_id = bucket.tenant_id
+
+    # Module 17 (laboratory): orders, barcode specimens and results for the
+    # caller's patient-read tenants. Verified rows and corrections both travel:
+    # the result screen must show the original value and its correction chain.
+    lab_workflows:
+      parameters:
+        - select
+            m.tenant_id as tenant_id
+          from public.memberships m
+          join public.role_permissions rp on rp.role_key = m.role_key
+          where m.user_id = :user_id
+            and m.status = 'active'
+            and m.valid_from <= now()
+            and (m.valid_until is null or m.valid_until > now())
+            and rp.permission_key = 'patient.read'
+      data:
+        - select * from public.lab_orders where tenant_id = bucket.tenant_id
+        - select s.* from public.lab_specimens s
+          join public.lab_orders o on o.id = s.lab_order_id
+          where o.tenant_id = bucket.tenant_id
+        - select r.* from public.lab_results r
+          where r.tenant_id = bucket.tenant_id

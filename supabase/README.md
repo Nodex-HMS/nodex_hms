@@ -39,10 +39,12 @@ these files by comments only — compare semantics, not bytes.
 | 20260905162531 | `phase1_revoke_anon_rpc_execute` |
 | 20260910120545 | `phase1_user_provisioning` |
 | 20260910120953 | `phase1_bootstrap_tenant_seed` |
-| 20260911120000 | `phase2_mpi_patient_identity` |
-| 20260911121000 | `phase2_mpi_contact_fields` |
-| 20260911122000 | `phase2_mutations_device_nullable` |
-| 20260912100000 | `phase2_emr_encounters` |
+| 20260911145344 | `phase2_mpi_patient_identity` |
+| 20260911151649 | `phase2_mpi_contact_fields` |
+| 20260911171737 | `phase2_mutations_device_nullable` |
+| 20260912013739 | `phase2_emr_encounters` |
+| 20260914154316 | `phase2_lab_workflows` |
+| 20260914154755 | `phase2_lab_correction_reason` |
 
 Two of these supersede earlier work rather than adding new objects, and are kept
 rather than squashed so the history explains itself:
@@ -172,6 +174,20 @@ reason, field changes and author — the signed row is never rewritten.
 The mutation path registers both tables: `encounter.started` /
 `encounter.updated` for the shell, `encounter.amended` for amendments
 (upsert-only, matching the append-only table).
+
+### Laboratory workflow (Module 17)
+
+`lab_orders`, `lab_specimens` and `lab_results` implement the handbook's
+order -> specimen collected -> result entered -> verified workflow. Accession
+barcodes are unique within a tenant. `lab_results` freezes verified values and
+requires corrections to be new rows linked through `correction_of` with an
+explicit `correction_reason`; the original value, verifier and timestamp remain
+auditable. Order cancellation/completion and result transitions are guarded by
+database triggers and CHECK constraints.
+
+The mutation path registers the three laboratory tables with per-operation
+audit actions. The PowerSync rules include them in the `lab_workflows` bucket;
+the local repository/use cases enforce the same state gates before writes.
 
 ### Backend mutation path
 

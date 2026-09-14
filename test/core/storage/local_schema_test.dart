@@ -26,7 +26,7 @@ void main() {
       expect(schema.validate, returnsNormally);
     });
 
-    test('declares every Phase 1 table plus Modules 10 and 16', () {
+    test('declares every Phase 1 table plus Modules 10, 16 and 17', () {
       final Set<String> tableNames = schema.tables
           .map((Table table) => table.name)
           .toSet();
@@ -52,6 +52,9 @@ void main() {
         LocalTables.patientMergeHistory,
         LocalTables.clinicalEncounters,
         LocalTables.encounterAmendments,
+        LocalTables.labOrders,
+        LocalTables.labSpecimens,
+        LocalTables.labResults,
       });
     });
 
@@ -300,6 +303,51 @@ void main() {
           'reason',
           'field_changes',
           'amended_by',
+        }),
+      );
+    });
+
+    test('laboratory tables mirror the Module 17 state machine schema', () {
+      Table byName(String name) =>
+          schema.tables.firstWhere((Table table) => table.name == name);
+
+      expect(
+        byName(LocalTables.labOrders).columns.map((Column c) => c.name).toSet(),
+        containsAll(<String>{
+          'tenant_id',
+          'patient_id',
+          'order_code',
+          'priority',
+          'status',
+          'tests',
+        }),
+      );
+      expect(
+        byName(LocalTables.labSpecimens).columns
+            .map((Column c) => c.name)
+            .toSet(),
+        containsAll(<String>{
+          'lab_order_id',
+          'accession_barcode',
+          'specimen_type',
+          'status',
+          'collected_at',
+        }),
+      );
+      expect(
+        byName(LocalTables.labResults).columns
+            .map((Column c) => c.name)
+            .toSet(),
+        containsAll(<String>{
+          'lab_order_id',
+          'specimen_id',
+          'analyte_code',
+          'value_text',
+          'value_numeric',
+          'status',
+          'verified_at',
+          'correction_of',
+          'correction_reason',
         }),
       );
     });

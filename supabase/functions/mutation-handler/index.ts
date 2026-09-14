@@ -79,7 +79,7 @@ const UUID_RE =
 //   - the audit actions recorded in audit_events per operation.
 // ---------------------------------------------------------------------------
 
-type ColumnType = 'text' | 'uuid' | 'boolean' | 'integer' | 'timestamp' | 'json'
+type ColumnType = 'text' | 'uuid' | 'boolean' | 'integer' | 'number' | 'timestamp' | 'json'
 
 interface TableRule {
   columns: Record<string, ColumnType>
@@ -200,6 +200,72 @@ const WRITABLE_TABLES: Readonly<Record<string, TableRule>> = {
     auditActionUpsert: 'encounter.amended',
     auditActionPatch: 'encounter.amended',
   },
+  // Module 17 (laboratory). Verified result rows are frozen server-side;
+  // corrections are new rows linked by correction_of.
+  lab_orders: {
+    columns: {
+      tenant_id: 'uuid',
+      patient_id: 'uuid',
+      encounter_id: 'uuid',
+      ordered_by: 'uuid',
+      order_code: 'text',
+      priority: 'text',
+      status: 'text',
+      clinical_indication: 'text',
+      tests: 'json',
+      ordered_at: 'timestamp',
+      cancelled_at: 'timestamp',
+      cancelled_reason: 'text',
+      created_at: 'timestamp',
+      updated_at: 'timestamp',
+    },
+    operations: ['upsert', 'patch'],
+    auditActionUpsert: 'lab.order.created',
+    auditActionPatch: 'lab.order.updated',
+  },
+  lab_specimens: {
+    columns: {
+      tenant_id: 'uuid',
+      lab_order_id: 'uuid',
+      accession_barcode: 'text',
+      specimen_type: 'text',
+      collected_by: 'uuid',
+      collected_at: 'timestamp',
+      status: 'text',
+      rejection_reason: 'text',
+      received_at: 'timestamp',
+      created_at: 'timestamp',
+      updated_at: 'timestamp',
+    },
+    operations: ['upsert', 'patch'],
+    auditActionUpsert: 'lab.specimen.created',
+    auditActionPatch: 'lab.specimen.updated',
+  },
+  lab_results: {
+    columns: {
+      tenant_id: 'uuid',
+      lab_order_id: 'uuid',
+      specimen_id: 'uuid',
+      analyte_code: 'text',
+      analyte_name: 'text',
+      value_text: 'text',
+      value_numeric: 'number',
+      unit: 'text',
+      reference_range: 'text',
+      abnormal_flag: 'text',
+      status: 'text',
+      entered_by: 'uuid',
+      verified_by: 'uuid',
+      entered_at: 'timestamp',
+      verified_at: 'timestamp',
+      correction_of: 'uuid',
+      correction_reason: 'text',
+      created_at: 'timestamp',
+    },
+    operations: ['upsert', 'patch'],
+    auditActionUpsert: 'lab.result.created',
+    auditActionPatch: 'lab.result.updated',
+  },
 }
 
 // ---------------------------------------------------------------------------
@@ -271,6 +337,9 @@ function validateColumns(
         break
       case 'integer':
         if (typeof value !== 'number' || !Number.isInteger(value)) return { ok: false, error: `column "${key}" must be an integer` }
+        break
+      case 'number':
+        if (typeof value !== 'number' || !Number.isFinite(value)) return { ok: false, error: `column "${key}" must be a number` }
         break
       case 'timestamp':
         if (typeof value !== 'string' || Number.isNaN(Date.parse(value))) return { ok: false, error: `column "${key}" must be an ISO-8601 timestamp` }

@@ -80,6 +80,15 @@ abstract final class LocalTables {
 
   /// Encounter amendments (Module 16). Synced, append-only.
   static const String encounterAmendments = 'encounter_amendments';
+
+  /// Laboratory orders (Module 17).
+  static const String labOrders = 'lab_orders';
+
+  /// Barcode-tracked laboratory specimens (Module 17).
+  static const String labSpecimens = 'lab_specimens';
+
+  /// Laboratory results, immutable after verification (Module 17).
+  static const String labResults = 'lab_results';
 }
 
 /// Builds the PowerSync schema for the Phase 1 foundation.
@@ -109,6 +118,9 @@ abstract final class NodexLocalSchema {
     _patientMergeHistory,
     _clinicalEncounters,
     _encounterAmendments,
+    _labOrders,
+    _labSpecimens,
+    _labResults,
   ]);
 
   static const Table _tenants = Table(LocalTables.tenants, <Column>[
@@ -554,6 +566,98 @@ abstract final class NodexLocalSchema {
     indexes: <Index>[
       Index('amendment_encounter', <IndexedColumn>[
         IndexedColumn('encounter_id'),
+      ]),
+    ],
+  );
+
+  /// Laboratory orders (Module 17).
+  static const Table _labOrders = Table(
+    LocalTables.labOrders,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('patient_id'),
+      Column.text('encounter_id'),
+      Column.text('ordered_by'),
+      Column.text('order_code'),
+      Column.text('priority'),
+      Column.text('status'),
+      Column.text('clinical_indication'),
+      Column.text('tests'),
+      Column.text('ordered_at'),
+      Column.text('cancelled_at'),
+      Column.text('cancelled_reason'),
+      Column.text('created_at'),
+      Column.text('updated_at'),
+    ],
+    indexes: <Index>[
+      Index('lab_order_patient', <IndexedColumn>[
+        IndexedColumn('patient_id'),
+        IndexedColumn('ordered_at'),
+      ]),
+      Index('lab_order_status', <IndexedColumn>[
+        IndexedColumn('tenant_id'),
+        IndexedColumn('status'),
+      ]),
+    ],
+  );
+
+  /// Barcode-tracked specimens (Module 17).
+  static const Table _labSpecimens = Table(
+    LocalTables.labSpecimens,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('lab_order_id'),
+      Column.text('accession_barcode'),
+      Column.text('specimen_type'),
+      Column.text('collected_by'),
+      Column.text('collected_at'),
+      Column.text('status'),
+      Column.text('rejection_reason'),
+      Column.text('received_at'),
+      Column.text('created_at'),
+      Column.text('updated_at'),
+    ],
+    indexes: <Index>[
+      Index('lab_specimen_order', <IndexedColumn>[
+        IndexedColumn('lab_order_id'),
+      ]),
+      Index('lab_specimen_barcode', <IndexedColumn>[
+        IndexedColumn('accession_barcode'),
+      ]),
+    ],
+  );
+
+  /// Results: verified rows are immutable; corrections are new rows linked by
+  /// correction_of.
+  static const Table _labResults = Table(
+    LocalTables.labResults,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('lab_order_id'),
+      Column.text('specimen_id'),
+      Column.text('analyte_code'),
+      Column.text('analyte_name'),
+      Column.text('value_text'),
+      Column.real('value_numeric'),
+      Column.text('unit'),
+      Column.text('reference_range'),
+      Column.text('abnormal_flag'),
+      Column.text('status'),
+      Column.text('entered_by'),
+      Column.text('verified_by'),
+      Column.text('entered_at'),
+      Column.text('verified_at'),
+      Column.text('correction_of'),
+      Column.text('correction_reason'),
+      Column.text('created_at'),
+    ],
+    indexes: <Index>[
+      Index('lab_result_order', <IndexedColumn>[
+        IndexedColumn('lab_order_id'),
+        IndexedColumn('created_at'),
+      ]),
+      Index('lab_result_specimen', <IndexedColumn>[
+        IndexedColumn('specimen_id'),
       ]),
     ],
   );

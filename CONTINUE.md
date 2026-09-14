@@ -46,7 +46,7 @@ flutter analyze --fatal-infos --fatal-warnings
 flutter test
 ```
 
-Expected: no formatting changes, no analyzer issues, 290 tests passing. If any of
+Expected: no formatting changes, no analyzer issues, 332 tests passing. If any of
 those fail on a clean checkout, fix that before writing new code — CI enforces
 all three.
 
@@ -133,15 +133,16 @@ Next on this path: `device_id` in the mutations ledger (connector currently
 sends null) and a real SHA-256 `payload_digest` instead of the idempotency-key
 placeholder.
 
-### 3. First clinical module (MPI landed, encounters landed)
+### 3. First clinical modules (MPI, encounters and laboratory foundation landed)
 
 **Master Patient Index (module 10)** and **Longitudinal EMR encounters
 (module 16)** are implemented as reference vertical slices: Postgres schema
 with RLS, PowerSync local schema, repository with test seam, `*.write`-gated
 use cases, screens, field-level merge (MPI) and signature-gated freeze with
-append-only amendments (encounters), mutation-handler allowlist registration,
-and unit tests. The mutation-handler allowlist registers all five clinical
-tables.
+append-only amendments (encounters), and the laboratory state machine (order ->
+specimen -> entered result -> verified/corrected). All clinical tables are
+registered in the mutation-handler allowlist, and local schema/repository/use-
+case tests are present.
 
 Handbook deviations applied while building it (all deliberate, all documented
 in the migration headers):
@@ -152,11 +153,11 @@ in the migration headers):
 - Registry `mergeableFields` corrected to real column names (`phone_number`,
   not `phone`); six contact columns added to match
 
-Next module: encounters unblock labs (17), prescriptions (25) and discharge
-(23), all of which reference a clinical encounter. The lab module is the
-natural next slice: order → specimen → result → validate state machine,
-immutable results with correction workflow (`immutableWithCorrection`
-conflict policy), and barcode specimen tracking.
+Next module: finish the Laboratory UI (patient detail lab section, order detail,
+barcode collection and result verification), then build prescriptions/pharmacy
+(25) or appointments (07). The laboratory backend and domain foundation are
+already in place; the UI remains next so the whole state machine is exercised
+end to end.
 
 ---
 
@@ -167,7 +168,7 @@ Deferred deliberately, not overlooked.
 - **Release signing is not configured.** The release build type falls back to the
   debug key so verification builds succeed. Supply real signing material before
   distributing anything.
-- **No widget or integration tests.** All 245 tests are unit tests. The adaptive
+- **No widget or integration tests.** All 332 tests are unit tests. The adaptive
   shell, route guards and session lifecycle have no widget coverage; the spec's
   integration flows (appointment → encounter → prescription → pharmacy → billing)
   have none either.
