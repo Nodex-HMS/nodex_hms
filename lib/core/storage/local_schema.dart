@@ -17,7 +17,7 @@
 /// carrying its own conflict policy.
 library;
 
-import 'package:powersync_sqlcipher/powersync.dart';
+import 'package:powersync/powersync.dart';
 
 /// Local table names, referenced by repositories instead of inline literals.
 abstract final class LocalTables {

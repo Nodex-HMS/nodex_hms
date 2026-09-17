@@ -12,7 +12,7 @@ import 'package:nodex_hms/core/authorization/authorization_policy.dart';
 import 'package:nodex_hms/core/authorization/authorization_snapshot.dart';
 import 'package:nodex_hms/core/authorization/permission_catalog.dart';
 import 'package:nodex_hms/core/storage/local_schema.dart';
-import 'package:powersync_sqlcipher/powersync.dart';
+import 'package:powersync/powersync.dart';
 
 void main() {
   group('NodexLocalSchema', () {

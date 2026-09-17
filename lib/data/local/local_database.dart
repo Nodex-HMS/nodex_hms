@@ -16,7 +16,7 @@ import 'package:nodex_hms/core/logging/nodex_logger.dart';
 import 'package:nodex_hms/core/security/database_key_manager.dart';
 import 'package:nodex_hms/core/storage/local_schema.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:powersync_sqlcipher/powersync.dart';
+import 'package:powersync/powersync.dart';
 
 /// Owns the encrypted local operational projection.
 final class LocalDatabase {
@@ -76,9 +76,12 @@ final class LocalDatabase {
       final String key = await _keyManager.obtainKey();
       final String path = await _resolveDatabasePath();
 
-      final PowerSyncDatabase opened = PowerSyncDatabase.withFactory(
-        PowerSyncSQLCipherOpenFactory(path: path, key: key),
+      // PowerSync 2.x: encryption is a constructor option (SQLite3MultipleCiphers
+      // with SQLCipher compatibility, so pre-migration databases stay readable).
+      final PowerSyncDatabase opened = PowerSyncDatabase(
         schema: NodexLocalSchema.build(),
+        path: path,
+        encryption: EncryptionOptions(key: key),
       );
       await opened.initialize();
       _database = opened;

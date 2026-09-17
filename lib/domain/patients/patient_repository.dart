@@ -18,7 +18,7 @@ import 'package:nodex_hms/core/storage/local_schema.dart';
 import 'package:nodex_hms/data/local/local_database.dart';
 import 'package:nodex_hms/domain/patients/patient.dart';
 import 'package:nodex_hms/domain/patients/patient_merge.dart';
-import 'package:powersync_sqlcipher/sqlite3_common.dart';
+import 'package:sqlite3/common.dart';
 import 'package:uuid/uuid.dart';
 
 /// Minimal SQL surface the MPI repository needs from the local projection.

@@ -22,15 +22,19 @@ dependencies:
   go_router: ^18.0.1
 
   # Local operational projection.
-  # powersync_sqlcipher provides the encrypted SQLite database required by the
-  # specification; it re-exports the powersync_core API surface.
-  powersync_sqlcipher: ^0.1.17
+  # powersync 2.x bundles encryption (SQLite3MultipleCiphers, SQLCipher-
+  # compatible by default); the discontinued powersync_sqlcipher shim was
+  # removed. Encryption is enabled via EncryptionOptions in local_database.dart
+  # plus the sqlite3 hooks below.
+  powersync: ^2.4.0
+  # Direct import of Row/ResultSet types (was re-exported by powersync_sqlcipher).
+  sqlite3: ^3.6.0
 
   # Authoritative cloud system of record
   supabase_flutter: ^2.17.2
 
   # Device security primitives
-  flutter_secure_storage: ^11.0.0
+  flutter_secure_storage: ^11.2.0
   local_auth: ^3.0.2
 
   # Platform / environment
@@ -55,3 +59,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+# PowerSync 2.x native encryption: bundle SQLite3MultipleCiphers instead of
+# stock SQLite. sqlcipherCompatibility (default on native) keeps existing
+# SQLCipher-created databases readable.
+hooks:
+  user_defines:
+    sqlite3:
+      source: sqlite3mc

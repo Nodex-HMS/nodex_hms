@@ -16,7 +16,8 @@ android {
     defaultConfig {
         applicationId = "com.nodex.nodex_hms"
 
-        // SQLCipher via powersync_sqlcipher requires API 23+; flutter_secure_storage
+        // Encrypted SQLite via powersync 2.x (SQLite3MultipleCiphers) requires
+        // API 23+; flutter_secure_storage
         // uses EncryptedSharedPreferences, which also needs 23+. Ward tablets below
         // this level cannot store clinical data under the required protection.
         minSdk = maxOf(flutter.minSdkVersion, 23)

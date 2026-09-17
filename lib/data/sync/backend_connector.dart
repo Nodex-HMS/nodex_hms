@@ -21,7 +21,7 @@ import 'package:nodex_hms/core/logging/nodex_logger.dart';
 import 'package:nodex_hms/core/sync/conflict_policy.dart';
 import 'package:nodex_hms/data/remote/supabase_gateway.dart';
 import 'package:nodex_hms/data/sync/mutation_batch.dart';
-import 'package:powersync_sqlcipher/powersync.dart';
+import 'package:powersync/powersync.dart';
 
 /// Outcome of attempting to upload one batch of local mutations.
 enum UploadOutcome {
