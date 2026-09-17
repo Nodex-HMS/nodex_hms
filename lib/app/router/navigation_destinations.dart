@@ -101,6 +101,16 @@ abstract final class NodexDestinations {
         moduleCode: 'M07',
       );
 
+  /// Ward census board. Phase 2 supplies the implementation.
+  static const NavigationDestinationSpec wards = NavigationDestinationSpec(
+    routePath: '/wards',
+    label: 'Wards',
+    icon: Icons.single_bed_outlined,
+    selectedIcon: Icons.single_bed,
+    requiredPermissions: <String>{NodexPermissions.bedAssign},
+    moduleCode: 'M11',
+  );
+
   /// Synchronization diagnostics: queue depth, retries, conflicts, failures.
   static const NavigationDestinationSpec syncDiagnostics =
       NavigationDestinationSpec(
@@ -151,6 +161,7 @@ abstract final class NodexDestinations {
         home,
         patients,
         appointments,
+        wards,
         syncDiagnostics,
         aiGovernance,
         audit,

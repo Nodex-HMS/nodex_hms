@@ -206,3 +206,23 @@ sync_rules:
             and rp.permission_key = 'appointment.read'
       data:
         - select * from public.appointments where tenant_id = bucket.tenant_id
+
+    # Module 11 (beds): ward beds and occupancy for the caller's
+    # patient-read tenants. The census board reads beds with their active
+    # assignments, so both travel together.
+    ward_census:
+      parameters:
+        - select
+            m.tenant_id as tenant_id
+          from public.memberships m
+          join public.role_permissions rp on rp.role_key = m.role_key
+          where m.user_id = :user_id
+            and m.status = 'active'
+            and m.valid_from <= now()
+            and (m.valid_until is null or m.valid_until > now())
+            and rp.permission_key = 'patient.read'
+      data:
+        - select * from public.beds where tenant_id = bucket.tenant_id
+        - select a.* from public.bed_assignments a
+          join public.beds b on b.id = a.bed_id
+          where b.tenant_id = bucket.tenant_id

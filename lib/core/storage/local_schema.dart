@@ -104,6 +104,12 @@ abstract final class LocalTables {
 
   /// Visit bookings (Module 07). Synced, tenant-scoped.
   static const String appointments = 'appointments';
+
+  /// Ward beds (Module 11). Synced, tenant-scoped.
+  static const String beds = 'beds';
+
+  /// Bed occupancy assignments (Module 11). Synced.
+  static const String bedAssignments = 'bed_assignments';
 }
 
 /// Builds the PowerSync schema for the Phase 1 foundation.
@@ -141,6 +147,8 @@ abstract final class NodexLocalSchema {
     _pharmacyDispenses,
     _medicationAdministrations,
     _appointments,
+    _beds,
+    _bedAssignments,
   ]);
 
   static const Table _tenants = Table(LocalTables.tenants, <Column>[
@@ -791,6 +799,53 @@ abstract final class NodexLocalSchema {
         IndexedColumn('administered_at'),
       ]),
       Index('mar_item', <IndexedColumn>[IndexedColumn('item_id')]),
+    ],
+  );
+
+  /// Ward beds: availability only; occupancy derives from assignments.
+  static const Table _beds = Table(
+    LocalTables.beds,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('ward_id'),
+      Column.text('bed_code'),
+      Column.text('bed_type'),
+      Column.text('status'),
+      Column.text('created_at'),
+      Column.text('updated_at'),
+    ],
+    indexes: <Index>[
+      Index('bed_ward', <IndexedColumn>[
+        IndexedColumn('ward_id'),
+        IndexedColumn('status'),
+      ]),
+    ],
+  );
+
+  /// Occupancy assignments: at most one active row per bed and per patient.
+  static const Table _bedAssignments = Table(
+    LocalTables.bedAssignments,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('bed_id'),
+      Column.text('patient_id'),
+      Column.text('encounter_id'),
+      Column.text('assigned_by'),
+      Column.text('status'),
+      Column.text('admitted_at'),
+      Column.text('released_at'),
+      Column.text('release_reason'),
+      Column.text('created_at'),
+      Column.text('updated_at'),
+    ],
+    indexes: <Index>[
+      Index('bed_assignment_bed', <IndexedColumn>[
+        IndexedColumn('bed_id'),
+        IndexedColumn('status'),
+      ]),
+      Index('bed_assignment_patient', <IndexedColumn>[
+        IndexedColumn('patient_id'),
+      ]),
     ],
   );
 

@@ -60,6 +60,8 @@ void main() {
         LocalTables.pharmacyDispenses,
         LocalTables.medicationAdministrations,
         LocalTables.appointments,
+        LocalTables.beds,
+        LocalTables.bedAssignments,
       });
     });
 
@@ -421,6 +423,37 @@ void main() {
       );
     });
 
+    test('bed tables mirror the Module 11 census schema', () {
+      Table byName(String name) =>
+          schema.tables.firstWhere((Table table) => table.name == name);
+
+      expect(
+        byName(LocalTables.beds).columns.map((Column c) => c.name).toSet(),
+        containsAll(<String>{
+          'tenant_id',
+          'ward_id',
+          'bed_code',
+          'bed_type',
+          'status',
+        }),
+      );
+      expect(
+        byName(LocalTables.bedAssignments).columns
+            .map((Column c) => c.name)
+            .toSet(),
+        containsAll(<String>{
+          'tenant_id',
+          'bed_id',
+          'patient_id',
+          'assigned_by',
+          'status',
+          'admitted_at',
+          'released_at',
+          'release_reason',
+        }),
+      );
+    });
+
     test('appointment table mirrors the Module 07 schedule schema', () {
       Table byName(String name) =>
           schema.tables.firstWhere((Table table) => table.name == name);
@@ -695,5 +728,19 @@ void main() {
         expect(visible, isNot(contains(NodexDestinations.audit)));
       },
     );
+
+    test('a bed manager sees the ward census and appointments with read', () {
+      final AuthorizationPolicy manager = policyWith(<String>{
+        NodexPermissions.bedAssign,
+        NodexPermissions.appointmentRead,
+      });
+
+      final List<NavigationDestinationSpec> visible =
+          NodexDestinations.visibleTo(manager);
+
+      expect(visible, contains(NodexDestinations.wards));
+      expect(visible, contains(NodexDestinations.appointments));
+      expect(visible, isNot(contains(NodexDestinations.audit)));
+    });
   });
 }

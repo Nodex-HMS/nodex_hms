@@ -388,6 +388,42 @@ const WRITABLE_TABLES: Readonly<Record<string, TableRule>> = {
     auditActionUpsert: 'appointment.booked',
     auditActionPatch: 'appointment.updated',
   },
+  // Module 11 (beds). Allocation is server-arbitrated: the one-active-per-bed
+  // and one-active-per-patient exclusions reject conflicting offline
+  // allocations on upload (ConflictPolicy.serverAuthoritative). Occupancy is
+  // derived from the active assignment; beds carry only availability.
+  beds: {
+    columns: {
+      tenant_id: 'uuid',
+      ward_id: 'uuid',
+      bed_code: 'text',
+      bed_type: 'text',
+      status: 'text',
+      created_at: 'timestamp',
+      updated_at: 'timestamp',
+    },
+    operations: ['upsert', 'patch'],
+    auditActionUpsert: 'bed.registered',
+    auditActionPatch: 'bed.updated',
+  },
+  bed_assignments: {
+    columns: {
+      tenant_id: 'uuid',
+      bed_id: 'uuid',
+      patient_id: 'uuid',
+      encounter_id: 'uuid',
+      assigned_by: 'uuid',
+      status: 'text',
+      admitted_at: 'timestamp',
+      released_at: 'timestamp',
+      release_reason: 'text',
+      created_at: 'timestamp',
+      updated_at: 'timestamp',
+    },
+    operations: ['upsert', 'patch'],
+    auditActionUpsert: 'bed.assignment.created',
+    auditActionPatch: 'bed.assignment.updated',
+  },
 }
 
 // ---------------------------------------------------------------------------

@@ -21,6 +21,8 @@ import 'package:nodex_hms/data/local/local_database.dart';
 import 'package:nodex_hms/data/remote/supabase_gateway.dart';
 import 'package:nodex_hms/domain/appointments/appointment_repository.dart';
 import 'package:nodex_hms/domain/appointments/appointment_use_cases.dart';
+import 'package:nodex_hms/domain/beds/bed_repository.dart';
+import 'package:nodex_hms/domain/beds/bed_use_cases.dart';
 import 'package:nodex_hms/domain/encounters/encounter_repository.dart';
 import 'package:nodex_hms/domain/encounters/encounter_use_cases.dart';
 import 'package:nodex_hms/domain/laboratory/lab_repository.dart';
@@ -368,6 +370,49 @@ linkEncounterAppointmentUseCaseProvider =
       (Ref ref) => LinkEncounterAppointmentUseCase(
         repository: ref.watch(appointmentRepositoryProvider),
       ),
+    );
+
+/// Bed repository over the encrypted local projection.
+final Provider<BedRepository> bedRepositoryProvider = Provider<BedRepository>(
+  (Ref ref) => DefaultBedRepository(
+    store: PowerSyncPatientStore(database: ref.watch(localDatabaseProvider)),
+    logger: ref.watch(loggerProvider),
+  ),
+);
+
+/// Bed registration.
+final Provider<RegisterBedUseCase> registerBedUseCaseProvider =
+    Provider<RegisterBedUseCase>(
+      (Ref ref) =>
+          RegisterBedUseCase(repository: ref.watch(bedRepositoryProvider)),
+    );
+
+/// Bed availability.
+final Provider<SetBedStatusUseCase> setBedStatusUseCaseProvider =
+    Provider<SetBedStatusUseCase>(
+      (Ref ref) =>
+          SetBedStatusUseCase(repository: ref.watch(bedRepositoryProvider)),
+    );
+
+/// Bed allocation.
+final Provider<AssignBedUseCase> assignBedUseCaseProvider =
+    Provider<AssignBedUseCase>(
+      (Ref ref) =>
+          AssignBedUseCase(repository: ref.watch(bedRepositoryProvider)),
+    );
+
+/// Bed release.
+final Provider<ReleaseBedUseCase> releaseBedUseCaseProvider =
+    Provider<ReleaseBedUseCase>(
+      (Ref ref) =>
+          ReleaseBedUseCase(repository: ref.watch(bedRepositoryProvider)),
+    );
+
+/// Bed transfer.
+final Provider<TransferBedUseCase> transferBedUseCaseProvider =
+    Provider<TransferBedUseCase>(
+      (Ref ref) =>
+          TransferBedUseCase(repository: ref.watch(bedRepositoryProvider)),
     );
 
 /// AI model and routing configuration.
