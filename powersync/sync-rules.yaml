@@ -141,6 +141,12 @@ sync_rules:
           join public.clinical_encounters e on e.id = am.encounter_id
           join public.patients p on p.id = e.patient_id
           where p.tenant_id = bucket.tenant_id
+        # Module 23 (discharge): the discharge travels with its encounter, or
+        # the record reads as open when it is closed.
+        - select d.* from public.discharges d
+          join public.clinical_encounters e on e.id = d.encounter_id
+          join public.patients p on p.id = e.patient_id
+          where p.tenant_id = bucket.tenant_id
 
     # Module 17 (laboratory): orders, barcode specimens and results for the
     # caller's patient-read tenants. Verified rows and corrections both travel:

@@ -62,6 +62,7 @@ void main() {
         LocalTables.appointments,
         LocalTables.beds,
         LocalTables.bedAssignments,
+        LocalTables.discharges,
       });
     });
 
@@ -450,6 +451,30 @@ void main() {
           'admitted_at',
           'released_at',
           'release_reason',
+        }),
+      );
+    });
+
+    test('discharge table mirrors the Module 23 record schema', () {
+      Table byName(String name) =>
+          schema.tables.firstWhere((Table table) => table.name == name);
+
+      expect(
+        byName(LocalTables.discharges).columns
+            .map((Column c) => c.name)
+            .toSet(),
+        containsAll(<String>{
+          'tenant_id',
+          'patient_id',
+          'encounter_id',
+          'created_by',
+          'discharge_code',
+          'discharge_type',
+          'status',
+          'summary',
+          'follow_up_plan',
+          'finalized_by',
+          'finalized_at',
         }),
       );
     });

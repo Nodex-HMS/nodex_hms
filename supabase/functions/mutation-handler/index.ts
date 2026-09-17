@@ -424,6 +424,31 @@ const WRITABLE_TABLES: Readonly<Record<string, TableRule>> = {
     auditActionUpsert: 'bed.assignment.created',
     auditActionPatch: 'bed.assignment.updated',
   },
+  // Module 23 (discharge). One finalized record per encounter, immutable
+  // after finalization; a readmission is a new encounter with its own
+  // discharge (ConflictPolicy.immutableVersion).
+  discharges: {
+    columns: {
+      tenant_id: 'uuid',
+      patient_id: 'uuid',
+      encounter_id: 'uuid',
+      created_by: 'uuid',
+      discharge_code: 'text',
+      discharge_type: 'text',
+      status: 'text',
+      summary: 'text',
+      follow_up_plan: 'text',
+      finalized_by: 'uuid',
+      finalized_at: 'timestamp',
+      closed_at: 'timestamp',
+      closure_reason: 'text',
+      created_at: 'timestamp',
+      updated_at: 'timestamp',
+    },
+    operations: ['upsert', 'patch'],
+    auditActionUpsert: 'discharge.drafted',
+    auditActionPatch: 'discharge.updated',
+  },
 }
 
 // ---------------------------------------------------------------------------

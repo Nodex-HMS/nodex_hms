@@ -23,6 +23,8 @@ import 'package:nodex_hms/domain/appointments/appointment_repository.dart';
 import 'package:nodex_hms/domain/appointments/appointment_use_cases.dart';
 import 'package:nodex_hms/domain/beds/bed_repository.dart';
 import 'package:nodex_hms/domain/beds/bed_use_cases.dart';
+import 'package:nodex_hms/domain/discharge/discharge_repository.dart';
+import 'package:nodex_hms/domain/discharge/discharge_use_cases.dart';
 import 'package:nodex_hms/domain/encounters/encounter_repository.dart';
 import 'package:nodex_hms/domain/encounters/encounter_use_cases.dart';
 import 'package:nodex_hms/domain/laboratory/lab_repository.dart';
@@ -413,6 +415,41 @@ final Provider<TransferBedUseCase> transferBedUseCaseProvider =
     Provider<TransferBedUseCase>(
       (Ref ref) =>
           TransferBedUseCase(repository: ref.watch(bedRepositoryProvider)),
+    );
+
+/// Discharge repository over the encrypted local projection.
+final Provider<DischargeRepository> dischargeRepositoryProvider =
+    Provider<DischargeRepository>(
+      (Ref ref) => DefaultDischargeRepository(
+        store: PowerSyncPatientStore(
+          database: ref.watch(localDatabaseProvider),
+        ),
+        logger: ref.watch(loggerProvider),
+      ),
+    );
+
+/// Discharge drafting.
+final Provider<DraftDischargeUseCase> draftDischargeUseCaseProvider =
+    Provider<DraftDischargeUseCase>(
+      (Ref ref) => DraftDischargeUseCase(
+        repository: ref.watch(dischargeRepositoryProvider),
+      ),
+    );
+
+/// Discharge finalization.
+final Provider<FinalizeDischargeUseCase> finalizeDischargeUseCaseProvider =
+    Provider<FinalizeDischargeUseCase>(
+      (Ref ref) => FinalizeDischargeUseCase(
+        repository: ref.watch(dischargeRepositoryProvider),
+      ),
+    );
+
+/// Discharge cancellation.
+final Provider<CancelDischargeUseCase> cancelDischargeUseCaseProvider =
+    Provider<CancelDischargeUseCase>(
+      (Ref ref) => CancelDischargeUseCase(
+        repository: ref.watch(dischargeRepositoryProvider),
+      ),
     );
 
 /// AI model and routing configuration.

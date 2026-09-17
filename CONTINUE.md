@@ -46,7 +46,7 @@ flutter analyze --fatal-infos --fatal-warnings
 flutter test
 ```
 
-Expected: no formatting changes, no analyzer issues, 395 tests passing. If any of
+Expected: no formatting changes, no analyzer issues, 410 tests passing. If any of
 those fail on a clean checkout, fix that before writing new code — CI enforces
 all three.
 
@@ -160,13 +160,13 @@ in the migration headers):
   the trigger (RLS cannot distinguish them from draft edits); item release
   rides on the header authorization so prescribers need no dispense permission
 
-Next module: discharge (23) or billing (31). The bed vertical slice is
-complete at the code level (395 tests passing): ward census board with live
-occupancy derived from active assignments, server-arbitrated allocation
-(one-active-per-bed and per-patient exclusions), maintenance rotation,
-release-before-transfer ordering, and a stay banner on the patient record.
-Hardware barcode scanning, PowerSync device verification and clinical
-deployment validation remain across all clinical slices.
+Next module: billing (31). The discharge vertical slice is complete at the
+code level (410 tests passing): one finalized record per encounter, draft on
+encounter.write with high-risk online-only finalization enforced in-trigger,
+immutable after finalizing, encounter picker on the patient record, and a
+bed-release shortcut closing the stay loop. Hardware barcode scanning,
+PowerSync device verification and clinical deployment validation remain
+across all clinical slices.
 
 ---
 

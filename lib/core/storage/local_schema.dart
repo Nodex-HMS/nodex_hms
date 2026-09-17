@@ -110,6 +110,9 @@ abstract final class LocalTables {
 
   /// Bed occupancy assignments (Module 11). Synced.
   static const String bedAssignments = 'bed_assignments';
+
+  /// Discharge records, one per encounter (Module 23). Synced.
+  static const String discharges = 'discharges';
 }
 
 /// Builds the PowerSync schema for the Phase 1 foundation.
@@ -149,6 +152,7 @@ abstract final class NodexLocalSchema {
     _appointments,
     _beds,
     _bedAssignments,
+    _discharges,
   ]);
 
   static const Table _tenants = Table(LocalTables.tenants, <Column>[
@@ -845,6 +849,37 @@ abstract final class NodexLocalSchema {
       ]),
       Index('bed_assignment_patient', <IndexedColumn>[
         IndexedColumn('patient_id'),
+      ]),
+    ],
+  );
+
+  /// Discharge records: one finalized row per encounter, immutable after.
+  static const Table _discharges = Table(
+    LocalTables.discharges,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('patient_id'),
+      Column.text('encounter_id'),
+      Column.text('created_by'),
+      Column.text('discharge_code'),
+      Column.text('discharge_type'),
+      Column.text('status'),
+      Column.text('summary'),
+      Column.text('follow_up_plan'),
+      Column.text('finalized_by'),
+      Column.text('finalized_at'),
+      Column.text('closed_at'),
+      Column.text('closure_reason'),
+      Column.text('created_at'),
+      Column.text('updated_at'),
+    ],
+    indexes: <Index>[
+      Index('discharge_patient', <IndexedColumn>[
+        IndexedColumn('patient_id'),
+        IndexedColumn('created_at'),
+      ]),
+      Index('discharge_encounter', <IndexedColumn>[
+        IndexedColumn('encounter_id'),
       ]),
     ],
   );

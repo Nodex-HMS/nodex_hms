@@ -162,6 +162,9 @@ abstract final class ConflictPolicyRegistry {
   /// Clinical encounter shell.
   static const String encounter = 'encounter';
 
+  /// Discharge record.
+  static const String discharge = 'discharge';
+
   static const Map<String, ConflictPolicyEntry> _entries =
       <String, ConflictPolicyEntry>{
         patient: ConflictPolicyEntry(
@@ -253,6 +256,15 @@ abstract final class ConflictPolicyRegistry {
           rationale:
               'The encounter shell carries clinical context that must not be '
               'silently replaced while a colleague is documenting.',
+        ),
+        discharge: ConflictPolicyEntry(
+          resourceType: discharge,
+          policy: ConflictPolicy.immutableVersion,
+          rationale:
+              'A finalized discharge is the authorized record of the '
+              'episode and must remain readable exactly as issued. A '
+              'readmission is a new encounter with its own discharge, so no '
+              'version chain is needed.',
         ),
       };
 

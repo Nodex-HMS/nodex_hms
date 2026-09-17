@@ -24,6 +24,7 @@ void main() {
         ConflictPolicyRegistry.stockMovement,
         ConflictPolicyRegistry.bedAssignment,
         ConflictPolicyRegistry.billing,
+        ConflictPolicyRegistry.discharge,
       ];
 
       for (final String resourceType in required) {
@@ -129,6 +130,14 @@ void main() {
         ConflictPolicyRegistry.policyFor(ConflictPolicyRegistry.bedAssignment)
             .policy,
         ConflictPolicy.serverAuthoritative,
+      );
+    });
+
+    test('discharges are immutable versioned records', () {
+      expect(
+        ConflictPolicyRegistry.policyFor(ConflictPolicyRegistry.discharge)
+            .policy,
+        ConflictPolicy.immutableVersion,
       );
     });
 
