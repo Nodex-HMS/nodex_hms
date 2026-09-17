@@ -23,7 +23,7 @@ import 'package:nodex_hms/features/audit/audit_screen.dart';
 import 'package:nodex_hms/features/auth/sign_in_screen.dart';
 import 'package:nodex_hms/features/beds/ward_census_screen.dart';
 import 'package:nodex_hms/features/diagnostics/sync_diagnostics_screen.dart';
-import 'package:nodex_hms/features/discharge/discharge_detail_screen.dart';
+import 'package:nodex_hms/features/billing/invoice_detail_screen.dart';
 import 'package:nodex_hms/features/encounters/encounter_editor_screen.dart';
 import 'package:nodex_hms/features/home/home_screen.dart';
 import 'package:nodex_hms/features/laboratory/lab_order_screen.dart';
@@ -184,12 +184,30 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
                               state.pathParameters['prescriptionId']!,
                         ),
                   ),
-                  GoRoute(
+GoRoute(
                     path: 'discharge/:dischargeId',
                     builder: (BuildContext context, GoRouterState state) =>
                         DischargeDetailScreen(
-                          dischargeId: state.pathParameters['dischargeId']!,
+                          dischargeId:
+                              state.pathParameters['dischargeId']!,
                         ),
+                  ),
+                  GoRoute(
+                    path: 'billing/:invoiceId',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        InvoiceDetailScreen(
+                          invoiceId:
+                              state.pathParameters['invoiceId']!,
+                        ),
+                  ),
+                  GoRoute(
+                    path: 'billing/:invoiceId',
+                    builder: (BuildContext context, GoRouterState state) =>
+                        InvoiceDetailScreen(
+                          invoiceId:
+                              state.pathParameters['invoiceId']!,
+                        ),
+                  ),
                   ),
                 ],
               ),

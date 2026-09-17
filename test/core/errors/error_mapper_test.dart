@@ -220,6 +220,22 @@ void main() {
       expect((mapped as IntegrityError).subject, 'lab_results');
     });
 
+    test('maps an exclusion violation to a server-authoritative conflict', () {
+      // A lost slot, bed or settlement race is arbitration, not an opaque
+      // failure: the device reconciles to server state under the registered
+      // serverAuthoritative policy.
+      final NodexError mapped = NodexErrorMapper.mapPostgres(
+        sqlState: PostgresErrorCode.exclusionViolation,
+        message: 'conflicting key value violates exclusion constraint "appointment_no_double_book"',
+        resourceType: 'appointments',
+      );
+
+      expect(mapped, isA<SyncConflictError>());
+      expect((mapped as SyncConflictError).policy, 'server_authoritative');
+      expect(mapped.isRetryable, isFalse);
+      expect(mapped.allowsLocalContinuation, isTrue);
+    });
+
     test(
       'maps serialization failures to a transactional SyncConflictError',
       () {

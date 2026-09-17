@@ -14,6 +14,13 @@ library;
 import 'package:meta/meta.dart';
 import 'package:nodex_hms/core/errors/nodex_error.dart';
 
+/// Postgres SQLSTATE for an exclusion-constraint violation.
+///
+/// The registry needs it to state which policy arbitrates a rejected offline
+/// write: `23P01` is how the server refuses a double-booked slot, a
+/// double-held bed or an over-settled invoice, and no other SQLSTATE does.
+const String exclusionViolationSqlState = '23P01';
+
 /// Deterministic conflict resolution strategies.
 ///
 /// The wire values match the `entity_policy` check constraint on

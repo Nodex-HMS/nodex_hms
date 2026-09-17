@@ -44,6 +44,10 @@ abstract final class PostgresErrorCode {
 
   /// `invalid_parameter_value` - malformed client input rejected server-side.
   static const String invalidParameterValue = '22023';
+
+  /// `exclusion_violation` - a server-arbitrated allocation lost: a
+  /// double-booked slot, a double-held bed or an over-settled invoice.
+  static const String exclusionViolation = '23P01';
 }
 
 /// Translates arbitrary caught objects into normalized NODEX errors.
@@ -159,6 +163,19 @@ abstract final class NodexErrorMapper {
         return IntegrityError(
           message: 'The operation referenced a record outside this device data scope.',
           subject: resourceType ?? 'unknown_resource',
+          code: sqlState,
+          context: mergedContext,
+          cause: cause,
+        );
+
+      case PostgresErrorCode.exclusionViolation:
+        // The server arbitrated and the device lost. That is the registered
+        // serverAuthoritative policy doing its job, not an opaque failure, so
+        // the caller reconciles to server state instead of retrying blindly.
+        return SyncConflictError(
+          message: 'The server already committed a conflicting allocation for this resource.',
+          resourceType: resourceType ?? 'unknown_resource',
+          policy: 'server_authoritative',
           code: sqlState,
           context: mergedContext,
           cause: cause,
