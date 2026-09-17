@@ -357,6 +357,37 @@ const WRITABLE_TABLES: Readonly<Record<string, TableRule>> = {
     auditActionUpsert: 'rx.administration.recorded',
     auditActionPatch: 'rx.administration.recorded',
   },
+  // Module 07 (appointments). Slot allocation is server-arbitrated: the
+  // appointment_no_double_book exclusion rejects conflicting offline bookings
+  // on upload and the client reconciles to server state
+  // (ConflictPolicy.serverAuthoritative). No delete policy exists by design.
+  appointments: {
+    columns: {
+      tenant_id: 'uuid',
+      facility_id: 'uuid',
+      patient_id: 'uuid',
+      provider_id: 'uuid',
+      booked_by: 'uuid',
+      encounter_id: 'uuid',
+      appointment_code: 'text',
+      visit_type: 'text',
+      priority: 'text',
+      status: 'text',
+      reason: 'text',
+      scheduled_start: 'timestamp',
+      scheduled_end: 'timestamp',
+      checked_in_at: 'timestamp',
+      started_at: 'timestamp',
+      completed_at: 'timestamp',
+      cancelled_at: 'timestamp',
+      cancel_reason: 'text',
+      created_at: 'timestamp',
+      updated_at: 'timestamp',
+    },
+    operations: ['upsert', 'patch'],
+    auditActionUpsert: 'appointment.booked',
+    auditActionPatch: 'appointment.updated',
+  },
 }
 
 // ---------------------------------------------------------------------------

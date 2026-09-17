@@ -46,7 +46,7 @@ flutter analyze --fatal-infos --fatal-warnings
 flutter test
 ```
 
-Expected: no formatting changes, no analyzer issues, 359 tests passing. If any of
+Expected: no formatting changes, no analyzer issues, 377 tests passing. If any of
 those fail on a clean checkout, fix that before writing new code — CI enforces
 all three.
 
@@ -160,10 +160,13 @@ in the migration headers):
   the trigger (RLS cannot distinguish them from draft edits); item release
   rides on the header authorization so prescribers need no dispense permission
 
-Next module: appointments (07). The prescription vertical slice is complete at
-the code level (359 tests passing); hardware barcode scanning, PowerSync
-device verification and clinical deployment validation remain across all
-clinical slices.
+Next module: beds (11), discharge (23) or billing (31). The appointment
+vertical slice is complete at the code level (377 tests passing): booking
+with server-arbitrated slots (no-double-book exclusion), confirm/check-in/
+visit/complete flow, cancel with reason, no-show marking, rescheduling while
+unconfirmed, and start-visit-to-encounter linking. Hardware barcode scanning,
+PowerSync device verification and clinical deployment validation remain
+across all clinical slices.
 
 ---
 

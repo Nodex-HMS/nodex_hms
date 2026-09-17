@@ -26,7 +26,7 @@ void main() {
       expect(schema.validate, returnsNormally);
     });
 
-    test('declares every Phase 1 table plus Modules 10, 16, 17 and 25', () {
+    test('declares every Phase 1 table plus Modules 07, 10, 16, 17 and 25', () {
       final Set<String> tableNames = schema.tables
           .map((Table table) => table.name)
           .toSet();
@@ -59,6 +59,7 @@ void main() {
         LocalTables.prescriptionItems,
         LocalTables.pharmacyDispenses,
         LocalTables.medicationAdministrations,
+        LocalTables.appointments,
       });
     });
 
@@ -416,6 +417,30 @@ void main() {
           'administered_by',
           'administered_at',
           'dose_text',
+        }),
+      );
+    });
+
+    test('appointment table mirrors the Module 07 schedule schema', () {
+      Table byName(String name) =>
+          schema.tables.firstWhere((Table table) => table.name == name);
+
+      expect(
+        byName(LocalTables.appointments).columns
+            .map((Column c) => c.name)
+            .toSet(),
+        containsAll(<String>{
+          'tenant_id',
+          'patient_id',
+          'provider_id',
+          'booked_by',
+          'encounter_id',
+          'appointment_code',
+          'visit_type',
+          'status',
+          'scheduled_start',
+          'scheduled_end',
+          'cancel_reason',
         }),
       );
     });

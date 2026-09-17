@@ -17,13 +17,14 @@ import 'package:nodex_hms/app/router/navigation_destinations.dart';
 import 'package:nodex_hms/app/shell/adaptive_shell.dart';
 import 'package:nodex_hms/domain/session/session_state.dart';
 import 'package:nodex_hms/features/ai_governance/ai_governance_screen.dart';
+import 'package:nodex_hms/features/appointments/appointment_detail_screen.dart';
+import 'package:nodex_hms/features/appointments/appointment_schedule_screen.dart';
 import 'package:nodex_hms/features/audit/audit_screen.dart';
 import 'package:nodex_hms/features/auth/sign_in_screen.dart';
 import 'package:nodex_hms/features/diagnostics/sync_diagnostics_screen.dart';
 import 'package:nodex_hms/features/encounters/encounter_editor_screen.dart';
 import 'package:nodex_hms/features/home/home_screen.dart';
 import 'package:nodex_hms/features/laboratory/lab_order_screen.dart';
-import 'package:nodex_hms/features/module_placeholder/module_placeholder_screen.dart';
 import 'package:nodex_hms/features/patients/patient_detail_screen.dart';
 import 'package:nodex_hms/features/patients/patient_search_screen.dart';
 import 'package:nodex_hms/features/prescriptions/prescription_detail_screen.dart';
@@ -188,10 +189,16 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
           GoRoute(
             path: NodexDestinations.appointments.routePath,
             builder: (BuildContext context, GoRouterState state) =>
-                const ModulePlaceholderScreen(
-                  destination: NodexDestinations.appointments,
-                  plannedPhase: 'Phase 2 - Core Clinical Workflows',
-                ),
+                const AppointmentScheduleScreen(),
+            routes: <RouteBase>[
+              GoRoute(
+                path: ':id',
+                builder: (BuildContext context, GoRouterState state) =>
+                    AppointmentDetailScreen(
+                      appointmentId: state.pathParameters['id']!,
+                    ),
+              ),
+            ],
           ),
           GoRoute(
             path: NodexDestinations.syncDiagnostics.routePath,

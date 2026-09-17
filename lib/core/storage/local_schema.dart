@@ -101,6 +101,9 @@ abstract final class LocalTables {
 
   /// Medication administration events (Module 25). Synced, append-only.
   static const String medicationAdministrations = 'medication_administrations';
+
+  /// Visit bookings (Module 07). Synced, tenant-scoped.
+  static const String appointments = 'appointments';
 }
 
 /// Builds the PowerSync schema for the Phase 1 foundation.
@@ -137,6 +140,7 @@ abstract final class NodexLocalSchema {
     _prescriptionItems,
     _pharmacyDispenses,
     _medicationAdministrations,
+    _appointments,
   ]);
 
   static const Table _tenants = Table(LocalTables.tenants, <Column>[
@@ -787,6 +791,47 @@ abstract final class NodexLocalSchema {
         IndexedColumn('administered_at'),
       ]),
       Index('mar_item', <IndexedColumn>[IndexedColumn('item_id')]),
+    ],
+  );
+
+  /// Visit bookings: the server arbitrates slots, the device holds the scope.
+  static const Table _appointments = Table(
+    LocalTables.appointments,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('facility_id'),
+      Column.text('patient_id'),
+      Column.text('provider_id'),
+      Column.text('booked_by'),
+      Column.text('encounter_id'),
+      Column.text('appointment_code'),
+      Column.text('visit_type'),
+      Column.text('priority'),
+      Column.text('status'),
+      Column.text('reason'),
+      Column.text('scheduled_start'),
+      Column.text('scheduled_end'),
+      Column.text('checked_in_at'),
+      Column.text('started_at'),
+      Column.text('completed_at'),
+      Column.text('cancelled_at'),
+      Column.text('cancel_reason'),
+      Column.text('created_at'),
+      Column.text('updated_at'),
+    ],
+    indexes: <Index>[
+      Index('appointment_patient', <IndexedColumn>[
+        IndexedColumn('patient_id'),
+        IndexedColumn('scheduled_start'),
+      ]),
+      Index('appointment_provider', <IndexedColumn>[
+        IndexedColumn('provider_id'),
+        IndexedColumn('scheduled_start'),
+      ]),
+      Index('appointment_status', <IndexedColumn>[
+        IndexedColumn('tenant_id'),
+        IndexedColumn('status'),
+      ]),
     ],
   );
 }

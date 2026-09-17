@@ -19,6 +19,8 @@ import 'package:nodex_hms/core/security/database_key_manager.dart';
 import 'package:nodex_hms/core/security/secure_key_store.dart';
 import 'package:nodex_hms/data/local/local_database.dart';
 import 'package:nodex_hms/data/remote/supabase_gateway.dart';
+import 'package:nodex_hms/domain/appointments/appointment_repository.dart';
+import 'package:nodex_hms/domain/appointments/appointment_use_cases.dart';
 import 'package:nodex_hms/domain/encounters/encounter_repository.dart';
 import 'package:nodex_hms/domain/encounters/encounter_use_cases.dart';
 import 'package:nodex_hms/domain/laboratory/lab_repository.dart';
@@ -323,6 +325,50 @@ recordAdministrationUseCaseProvider = Provider<RecordAdministrationUseCase>(
     repository: ref.watch(prescriptionRepositoryProvider),
   ),
 );
+
+/// Appointment repository over the encrypted local projection.
+final Provider<AppointmentRepository> appointmentRepositoryProvider =
+    Provider<AppointmentRepository>(
+      (Ref ref) => DefaultAppointmentRepository(
+        store: PowerSyncPatientStore(
+          database: ref.watch(localDatabaseProvider),
+        ),
+        logger: ref.watch(loggerProvider),
+      ),
+    );
+
+/// Visit booking.
+final Provider<BookAppointmentUseCase> bookAppointmentUseCaseProvider =
+    Provider<BookAppointmentUseCase>(
+      (Ref ref) => BookAppointmentUseCase(
+        repository: ref.watch(appointmentRepositoryProvider),
+      ),
+    );
+
+/// Appointment lifecycle transitions.
+final Provider<TransitionAppointmentUseCase>
+transitionAppointmentUseCaseProvider = Provider<TransitionAppointmentUseCase>(
+  (Ref ref) => TransitionAppointmentUseCase(
+    repository: ref.watch(appointmentRepositoryProvider),
+  ),
+);
+
+/// Appointment rescheduling.
+final Provider<RescheduleAppointmentUseCase>
+rescheduleAppointmentUseCaseProvider = Provider<RescheduleAppointmentUseCase>(
+  (Ref ref) => RescheduleAppointmentUseCase(
+    repository: ref.watch(appointmentRepositoryProvider),
+  ),
+);
+
+/// Appointment to encounter linking.
+final Provider<LinkEncounterAppointmentUseCase>
+linkEncounterAppointmentUseCaseProvider =
+    Provider<LinkEncounterAppointmentUseCase>(
+      (Ref ref) => LinkEncounterAppointmentUseCase(
+        repository: ref.watch(appointmentRepositoryProvider),
+      ),
+    );
 
 /// AI model and routing configuration.
 ///

@@ -39,8 +39,8 @@ module's stream must reproduce the scope its RLS helpers enforce, and the
 acceptance test inspects the local database, not the UI. Defined so far:
 `mpi_patients` (Module 10), `emr_encounters` (Module 16), `lab_workflows`
 (Module 17), `rx_pharmacy` (Module 25, including superseded versions and the
-MAR). Remaining: appointments, beds, discharge, billing and the rest of the
-54-module scope.
+MAR), `appt_schedule` (Module 07). Remaining: beds, discharge, billing and
+the rest of the 54-module scope.
 
 ## Upload path
 
