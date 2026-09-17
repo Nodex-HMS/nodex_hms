@@ -89,6 +89,18 @@ abstract final class LocalTables {
 
   /// Laboratory results, immutable after verification (Module 17).
   static const String labResults = 'lab_results';
+
+  /// Prescription orders, immutable versions after finalization (Module 25).
+  static const String prescriptions = 'prescriptions';
+
+  /// Prescription medication lines (Module 25).
+  static const String prescriptionItems = 'prescription_items';
+
+  /// Pharmacy dispense events (Module 25). Synced, append-only.
+  static const String pharmacyDispenses = 'pharmacy_dispenses';
+
+  /// Medication administration events (Module 25). Synced, append-only.
+  static const String medicationAdministrations = 'medication_administrations';
 }
 
 /// Builds the PowerSync schema for the Phase 1 foundation.
@@ -121,6 +133,10 @@ abstract final class NodexLocalSchema {
     _labOrders,
     _labSpecimens,
     _labResults,
+    _prescriptions,
+    _prescriptionItems,
+    _pharmacyDispenses,
+    _medicationAdministrations,
   ]);
 
   static const Table _tenants = Table(LocalTables.tenants, <Column>[
@@ -659,6 +675,118 @@ abstract final class NodexLocalSchema {
       Index('lab_result_specimen', <IndexedColumn>[
         IndexedColumn('specimen_id'),
       ]),
+    ],
+  );
+
+  /// Prescriptions: finalized versions are immutable; a change is a new
+  /// version linked by supersedes/superseded_by.
+  static const Table _prescriptions = Table(
+    LocalTables.prescriptions,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('patient_id'),
+      Column.text('encounter_id'),
+      Column.text('prescribed_by'),
+      Column.text('prescription_code'),
+      Column.text('version'),
+      Column.text('priority'),
+      Column.text('status'),
+      Column.text('indication'),
+      Column.text('finalized_by'),
+      Column.text('finalized_at'),
+      Column.text('supersedes'),
+      Column.text('superseded_by'),
+      Column.text('closed_at'),
+      Column.text('closure_reason'),
+      Column.text('created_at'),
+      Column.text('updated_at'),
+    ],
+    indexes: <Index>[
+      Index('prescription_patient', <IndexedColumn>[
+        IndexedColumn('patient_id'),
+        IndexedColumn('created_at'),
+      ]),
+      Index('prescription_status', <IndexedColumn>[
+        IndexedColumn('tenant_id'),
+        IndexedColumn('status'),
+      ]),
+    ],
+  );
+
+  /// Prescription medication lines, editable while the parent order is a draft.
+  static const Table _prescriptionItems = Table(
+    LocalTables.prescriptionItems,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('prescription_id'),
+      Column.text('line_number'),
+      Column.text('drug_code'),
+      Column.text('drug_name'),
+      Column.text('strength'),
+      Column.text('dosage_text'),
+      Column.text('route'),
+      Column.text('frequency'),
+      Column.text('duration_days'),
+      Column.real('quantity_prescribed'),
+      Column.text('status'),
+      Column.text('created_at'),
+      Column.text('updated_at'),
+    ],
+    indexes: <Index>[
+      Index('prescription_item_order', <IndexedColumn>[
+        IndexedColumn('prescription_id'),
+      ]),
+      Index('prescription_item_drug', <IndexedColumn>[
+        IndexedColumn('drug_code'),
+      ]),
+    ],
+  );
+
+  /// Dispense events: append-only, deduplicated by event identity upstream.
+  static const Table _pharmacyDispenses = Table(
+    LocalTables.pharmacyDispenses,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('prescription_id'),
+      Column.text('item_id'),
+      Column.text('dispensed_by'),
+      Column.real('quantity_dispensed'),
+      Column.text('batch_number'),
+      Column.text('note'),
+      Column.text('dispensed_at'),
+      Column.text('created_at'),
+    ],
+    indexes: <Index>[
+      Index('dispense_item', <IndexedColumn>[IndexedColumn('item_id')]),
+      Index('dispense_prescription', <IndexedColumn>[
+        IndexedColumn('prescription_id'),
+      ]),
+    ],
+  );
+
+  /// MAR events: append-only, deduplicated by event identity upstream.
+  static const Table _medicationAdministrations = Table(
+    LocalTables.medicationAdministrations,
+    <Column>[
+      Column.text('tenant_id'),
+      Column.text('patient_id'),
+      Column.text('prescription_id'),
+      Column.text('item_id'),
+      Column.text('dispense_id'),
+      Column.text('administered_by'),
+      Column.text('administered_at'),
+      Column.text('dose_text'),
+      Column.text('route'),
+      Column.text('site'),
+      Column.text('note'),
+      Column.text('created_at'),
+    ],
+    indexes: <Index>[
+      Index('mar_patient', <IndexedColumn>[
+        IndexedColumn('patient_id'),
+        IndexedColumn('administered_at'),
+      ]),
+      Index('mar_item', <IndexedColumn>[IndexedColumn('item_id')]),
     ],
   );
 }

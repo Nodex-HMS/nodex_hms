@@ -266,6 +266,97 @@ const WRITABLE_TABLES: Readonly<Record<string, TableRule>> = {
     auditActionUpsert: 'lab.result.created',
     auditActionPatch: 'lab.result.updated',
   },
+  // Module 25 (prescriptions/pharmacy). Finalized versions are frozen
+  // server-side; a change is a new version linked by supersedes/superseded_by.
+  // The finalize-class transitions additionally require prescription.finalize
+  // in nodex.tg_prescription_transition_guard, which RLS alone cannot express.
+  prescriptions: {
+    columns: {
+      tenant_id: 'uuid',
+      patient_id: 'uuid',
+      encounter_id: 'uuid',
+      prescribed_by: 'uuid',
+      prescription_code: 'text',
+      version: 'integer',
+      priority: 'text',
+      status: 'text',
+      indication: 'text',
+      finalized_by: 'uuid',
+      finalized_at: 'timestamp',
+      supersedes: 'uuid',
+      superseded_by: 'uuid',
+      closed_at: 'timestamp',
+      closure_reason: 'text',
+      created_at: 'timestamp',
+      updated_at: 'timestamp',
+    },
+    operations: ['upsert', 'patch'],
+    auditActionUpsert: 'rx.prescription.created',
+    auditActionPatch: 'rx.prescription.updated',
+  },
+  // Item lines are editable while the parent order is a draft; once released
+  // only the dispense progression moves, enforced by
+  // nodex.tg_prescription_item_draft_guard.
+  prescription_items: {
+    columns: {
+      tenant_id: 'uuid',
+      prescription_id: 'uuid',
+      line_number: 'integer',
+      drug_code: 'text',
+      drug_name: 'text',
+      strength: 'text',
+      dosage_text: 'text',
+      route: 'text',
+      frequency: 'text',
+      duration_days: 'integer',
+      quantity_prescribed: 'number',
+      status: 'text',
+      created_at: 'timestamp',
+      updated_at: 'timestamp',
+    },
+    operations: ['upsert', 'patch'],
+    auditActionUpsert: 'rx.item.created',
+    auditActionPatch: 'rx.item.updated',
+  },
+  // Dispense rows are clinical events: upsert only, never patch. The
+  // pharmacy_dispenses_append_only trigger is the final enforcer.
+  pharmacy_dispenses: {
+    columns: {
+      tenant_id: 'uuid',
+      prescription_id: 'uuid',
+      item_id: 'uuid',
+      dispensed_by: 'uuid',
+      quantity_dispensed: 'number',
+      batch_number: 'text',
+      note: 'text',
+      dispensed_at: 'timestamp',
+      created_at: 'timestamp',
+    },
+    operations: ['upsert'],
+    auditActionUpsert: 'rx.dispense.recorded',
+    auditActionPatch: 'rx.dispense.recorded',
+  },
+  // MAR rows are clinical events: upsert only, never patch. Duplicates
+  // deduplicate by event identity upstream; the append-only trigger holds.
+  medication_administrations: {
+    columns: {
+      tenant_id: 'uuid',
+      patient_id: 'uuid',
+      prescription_id: 'uuid',
+      item_id: 'uuid',
+      dispense_id: 'uuid',
+      administered_by: 'uuid',
+      administered_at: 'timestamp',
+      dose_text: 'text',
+      route: 'text',
+      site: 'text',
+      note: 'text',
+      created_at: 'timestamp',
+    },
+    operations: ['upsert'],
+    auditActionUpsert: 'rx.administration.recorded',
+    auditActionPatch: 'rx.administration.recorded',
+  },
 }
 
 // ---------------------------------------------------------------------------

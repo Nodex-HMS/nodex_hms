@@ -163,3 +163,29 @@ sync_rules:
           where o.tenant_id = bucket.tenant_id
         - select r.* from public.lab_results r
           where r.tenant_id = bucket.tenant_id
+
+    # Module 25 (prescriptions/pharmacy): orders, lines, dispense events and
+    # MAR events for the caller's patient-read tenants. Superseded versions
+    # travel too: the detail screen must show what was authorized before, not
+    # just the current version. Events are append-only, so no pruning by
+    # status — a device that holds an order holds its full dispense history.
+    rx_pharmacy:
+      parameters:
+        - select
+            m.tenant_id as tenant_id
+          from public.memberships m
+          join public.role_permissions rp on rp.role_key = m.role_key
+          where m.user_id = :user_id
+            and m.status = 'active'
+            and m.valid_from <= now()
+            and (m.valid_until is null or m.valid_until > now())
+            and rp.permission_key = 'patient.read'
+      data:
+        - select * from public.prescriptions where tenant_id = bucket.tenant_id
+        - select i.* from public.prescription_items i
+          join public.prescriptions p on p.id = i.prescription_id
+          where p.tenant_id = bucket.tenant_id
+        - select d.* from public.pharmacy_dispenses d
+          where d.tenant_id = bucket.tenant_id
+        - select a.* from public.medication_administrations a
+          where a.tenant_id = bucket.tenant_id

@@ -46,7 +46,7 @@ flutter analyze --fatal-infos --fatal-warnings
 flutter test
 ```
 
-Expected: no formatting changes, no analyzer issues, 332 tests passing. If any of
+Expected: no formatting changes, no analyzer issues, 359 tests passing. If any of
 those fail on a clean checkout, fix that before writing new code — CI enforces
 all three.
 
@@ -133,17 +133,18 @@ Next on this path: `device_id` in the mutations ledger (connector currently
 sends null) and a real SHA-256 `payload_digest` instead of the idempotency-key
 placeholder.
 
-### 3. First clinical modules (MPI, encounters and laboratory vertical slice landed)
+### 3. First clinical modules (MPI, encounters, laboratory and Rx vertical slices landed)
 
 **Master Patient Index (module 10)** and **Longitudinal EMR encounters
 (module 16)** are implemented as reference vertical slices: Postgres schema
 with RLS, PowerSync local schema, repository with test seam, `*.write`-gated
 use cases, screens, field-level merge (MPI) and signature-gated freeze with
-append-only amendments (encounters), and the laboratory state machine (order ->
-specimen -> entered result -> verified/corrected). All clinical tables are
-registered in the mutation-handler allowlist, local schema/repositories/use-
-case tests are present, and the patient detail UI now links to encounter and
-laboratory workflows.
+append-only amendments (encounters), the laboratory state machine (order ->
+specimen -> entered result -> verified/corrected), and the prescription
+lifecycle (draft -> finalized version -> dispense events -> MAR events, module
+25). All clinical tables are registered in the mutation-handler allowlist,
+local schema/repositories/use-case tests are present, and the patient detail
+UI now links to encounter, laboratory and prescription workflows.
 
 Handbook deviations applied while building it (all deliberate, all documented
 in the migration headers):
@@ -153,10 +154,16 @@ in the migration headers):
 - Allergies as a separate frozen-column entity instead of JSONB columns
 - Registry `mergeableFields` corrected to real column names (`phone_number`,
   not `phone`); six contact columns added to match
+- Prescription series code is unique per `(tenant_id, code, version)`, with a
+  forward `superseded_by` link, because each version is its own row
+- Prescription finalize-class transitions enforce `prescription.finalize` in
+  the trigger (RLS cannot distinguish them from draft edits); item release
+  rides on the header authorization so prescribers need no dispense permission
 
-Next module: prescriptions/pharmacy (25) or appointments (07). The laboratory
-vertical slice is complete at the code level; hardware barcode scanning,
-PowerSync device verification and clinical deployment validation remain.
+Next module: appointments (07). The prescription vertical slice is complete at
+the code level (359 tests passing); hardware barcode scanning, PowerSync
+device verification and clinical deployment validation remain across all
+clinical slices.
 
 ---
 

@@ -34,10 +34,13 @@ Buckets mirror the membership graph in `public.memberships`:
 | `ai_configuration` | model registry, routing policies, deployment profiles | read-only global configuration, no PHI, no credentials |
 | `audit_self` | audit rows the caller authored | `actor_id = request.user_id()` |
 
-Clinical buckets (patients, encounters, prescriptions, MAR, labs) are **not**
-defined yet. They arrive per-module in Phase 2 with the same review: each
+Clinical buckets arrive per-module in Phase 2 with the same review: each
 module's stream must reproduce the scope its RLS helpers enforce, and the
-acceptance test inspects the local database, not the UI.
+acceptance test inspects the local database, not the UI. Defined so far:
+`mpi_patients` (Module 10), `emr_encounters` (Module 16), `lab_workflows`
+(Module 17), `rx_pharmacy` (Module 25, including superseded versions and the
+MAR). Remaining: appointments, beds, discharge, billing and the rest of the
+54-module scope.
 
 ## Upload path
 

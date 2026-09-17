@@ -25,6 +25,8 @@ import 'package:nodex_hms/domain/laboratory/lab_repository.dart';
 import 'package:nodex_hms/domain/laboratory/lab_use_cases.dart';
 import 'package:nodex_hms/domain/patients/patient_repository.dart';
 import 'package:nodex_hms/domain/patients/patient_use_cases.dart';
+import 'package:nodex_hms/domain/prescriptions/prescription_repository.dart';
+import 'package:nodex_hms/domain/prescriptions/prescription_use_cases.dart';
 import 'package:nodex_hms/domain/session/session_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -254,6 +256,73 @@ final Provider<CorrectLabResultUseCase> correctLabResultUseCaseProvider =
       (Ref ref) =>
           CorrectLabResultUseCase(repository: ref.watch(labRepositoryProvider)),
     );
+
+/// Prescription repository over the encrypted local projection.
+final Provider<PrescriptionRepository> prescriptionRepositoryProvider =
+    Provider<PrescriptionRepository>(
+      (Ref ref) => DefaultPrescriptionRepository(
+        store: PowerSyncPatientStore(
+          database: ref.watch(localDatabaseProvider),
+        ),
+        logger: ref.watch(loggerProvider),
+      ),
+    );
+
+/// Prescription drafting.
+final Provider<DraftPrescriptionUseCase> draftPrescriptionUseCaseProvider =
+    Provider<DraftPrescriptionUseCase>(
+      (Ref ref) => DraftPrescriptionUseCase(
+        repository: ref.watch(prescriptionRepositoryProvider),
+      ),
+    );
+
+/// Prescription line creation.
+final Provider<AddPrescriptionItemUseCase> addPrescriptionItemUseCaseProvider =
+    Provider<AddPrescriptionItemUseCase>(
+      (Ref ref) => AddPrescriptionItemUseCase(
+        repository: ref.watch(prescriptionRepositoryProvider),
+      ),
+    );
+
+/// Prescription finalization.
+final Provider<FinalizePrescriptionUseCase>
+finalizePrescriptionUseCaseProvider = Provider<FinalizePrescriptionUseCase>(
+  (Ref ref) => FinalizePrescriptionUseCase(
+    repository: ref.watch(prescriptionRepositoryProvider),
+  ),
+);
+
+/// Prescription versioning.
+final Provider<SupersedePrescriptionUseCase>
+supersedePrescriptionUseCaseProvider = Provider<SupersedePrescriptionUseCase>(
+  (Ref ref) => SupersedePrescriptionUseCase(
+    repository: ref.watch(prescriptionRepositoryProvider),
+  ),
+);
+
+/// Prescription closure.
+final Provider<ClosePrescriptionUseCase> closePrescriptionUseCaseProvider =
+    Provider<ClosePrescriptionUseCase>(
+      (Ref ref) => ClosePrescriptionUseCase(
+        repository: ref.watch(prescriptionRepositoryProvider),
+      ),
+    );
+
+/// Pharmacy dispensing.
+final Provider<RecordDispenseUseCase> recordDispenseUseCaseProvider =
+    Provider<RecordDispenseUseCase>(
+      (Ref ref) => RecordDispenseUseCase(
+        repository: ref.watch(prescriptionRepositoryProvider),
+      ),
+    );
+
+/// Medication administration.
+final Provider<RecordAdministrationUseCase>
+recordAdministrationUseCaseProvider = Provider<RecordAdministrationUseCase>(
+  (Ref ref) => RecordAdministrationUseCase(
+    repository: ref.watch(prescriptionRepositoryProvider),
+  ),
+);
 
 /// AI model and routing configuration.
 ///

@@ -26,7 +26,7 @@ void main() {
       expect(schema.validate, returnsNormally);
     });
 
-    test('declares every Phase 1 table plus Modules 10, 16 and 17', () {
+    test('declares every Phase 1 table plus Modules 10, 16, 17 and 25', () {
       final Set<String> tableNames = schema.tables
           .map((Table table) => table.name)
           .toSet();
@@ -55,6 +55,10 @@ void main() {
         LocalTables.labOrders,
         LocalTables.labSpecimens,
         LocalTables.labResults,
+        LocalTables.prescriptions,
+        LocalTables.prescriptionItems,
+        LocalTables.pharmacyDispenses,
+        LocalTables.medicationAdministrations,
       });
     });
 
@@ -348,6 +352,70 @@ void main() {
           'verified_at',
           'correction_of',
           'correction_reason',
+        }),
+      );
+    });
+
+    test('prescription tables mirror the Module 25 state machine schema', () {
+      Table byName(String name) =>
+          schema.tables.firstWhere((Table table) => table.name == name);
+
+      expect(
+        byName(LocalTables.prescriptions).columns
+            .map((Column c) => c.name)
+            .toSet(),
+        containsAll(<String>{
+          'tenant_id',
+          'patient_id',
+          'prescription_code',
+          'version',
+          'priority',
+          'status',
+          'finalized_by',
+          'finalized_at',
+          'supersedes',
+          'superseded_by',
+          'closed_at',
+          'closure_reason',
+        }),
+      );
+      expect(
+        byName(LocalTables.prescriptionItems).columns
+            .map((Column c) => c.name)
+            .toSet(),
+        containsAll(<String>{
+          'prescription_id',
+          'line_number',
+          'drug_code',
+          'drug_name',
+          'dosage_text',
+          'quantity_prescribed',
+          'status',
+        }),
+      );
+      expect(
+        byName(LocalTables.pharmacyDispenses).columns
+            .map((Column c) => c.name)
+            .toSet(),
+        containsAll(<String>{
+          'prescription_id',
+          'item_id',
+          'dispensed_by',
+          'quantity_dispensed',
+          'dispensed_at',
+        }),
+      );
+      expect(
+        byName(LocalTables.medicationAdministrations).columns
+            .map((Column c) => c.name)
+            .toSet(),
+        containsAll(<String>{
+          'patient_id',
+          'prescription_id',
+          'item_id',
+          'administered_by',
+          'administered_at',
+          'dose_text',
         }),
       );
     });
