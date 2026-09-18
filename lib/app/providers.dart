@@ -29,6 +29,8 @@ import 'package:nodex_hms/domain/billing/billing_repository.dart';
 import 'package:nodex_hms/domain/billing/billing_use_cases.dart';
 import 'package:nodex_hms/domain/discharge/discharge_repository.dart';
 import 'package:nodex_hms/domain/discharge/discharge_use_cases.dart';
+import 'package:nodex_hms/domain/inventory/inventory_repository.dart';
+import 'package:nodex_hms/domain/inventory/inventory_use_cases.dart';
 import 'package:nodex_hms/domain/encounters/encounter_repository.dart';
 import 'package:nodex_hms/domain/encounters/encounter_use_cases.dart';
 import 'package:nodex_hms/domain/laboratory/lab_repository.dart';
@@ -521,6 +523,65 @@ final Provider<CancelInvoiceUseCase> cancelInvoiceUseCaseProvider =
     Provider<CancelInvoiceUseCase>(
       (Ref ref) => CancelInvoiceUseCase(
         repository: ref.watch(billingRepositoryProvider),
+      ),
+    );
+
+/// Inventory repository over the encrypted local projection.
+final Provider<InventoryRepository> inventoryRepositoryProvider =
+    Provider<InventoryRepository>(
+      (Ref ref) => DefaultInventoryRepository(
+        store: PowerSyncPatientStore(
+          database: ref.watch(localDatabaseProvider),
+        ),
+        logger: ref.watch(loggerProvider),
+      ),
+    );
+
+/// Stock item registration.
+final Provider<RegisterStockItemUseCase> registerStockItemUseCaseProvider =
+    Provider<RegisterStockItemUseCase>(
+      (Ref ref) => RegisterStockItemUseCase(
+        repository: ref.watch(inventoryRepositoryProvider),
+      ),
+    );
+
+/// Item status management.
+final Provider<SetItemStatusUseCase> setItemStatusUseCaseProvider =
+    Provider<SetItemStatusUseCase>(
+      (Ref ref) => SetItemStatusUseCase(
+        repository: ref.watch(inventoryRepositoryProvider),
+      ),
+    );
+
+/// Location registration.
+final Provider<RegisterLocationUseCase> registerLocationUseCaseProvider =
+    Provider<RegisterLocationUseCase>(
+      (Ref ref) => RegisterLocationUseCase(
+        repository: ref.watch(inventoryRepositoryProvider),
+      ),
+    );
+
+/// Batch registration.
+final Provider<RegisterBatchUseCase> registerBatchUseCaseProvider =
+    Provider<RegisterBatchUseCase>(
+      (Ref ref) => RegisterBatchUseCase(
+        repository: ref.watch(inventoryRepositoryProvider),
+      ),
+    );
+
+/// Batch status updates.
+final Provider<UpdateBatchStatusUseCase> updateBatchStatusUseCaseProvider =
+    Provider<UpdateBatchStatusUseCase>(
+      (Ref ref) => UpdateBatchStatusUseCase(
+        repository: ref.watch(inventoryRepositoryProvider),
+      ),
+    );
+
+/// Stock movement recording.
+final Provider<RecordMovementUseCase> recordMovementUseCaseProvider =
+    Provider<RecordMovementUseCase>(
+      (Ref ref) => RecordMovementUseCase(
+        repository: ref.watch(inventoryRepositoryProvider),
       ),
     );
 

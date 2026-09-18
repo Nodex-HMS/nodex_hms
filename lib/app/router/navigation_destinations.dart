@@ -111,6 +111,16 @@ abstract final class NodexDestinations {
     moduleCode: 'M11',
   );
 
+  /// Inventory management. Phase 2 supplies the implementation.
+  static const NavigationDestinationSpec inventory = NavigationDestinationSpec(
+    routePath: '/inventory',
+    label: 'Inventory',
+    icon: Icons.inventory_2_outlined,
+    selectedIcon: Icons.inventory_2,
+    requiredPermissions: <String>{NodexPermissions.inventoryMovement},
+    moduleCode: 'M13',
+  );
+
   /// Synchronization diagnostics: queue depth, retries, conflicts, failures.
   static const NavigationDestinationSpec syncDiagnostics =
       NavigationDestinationSpec(
@@ -162,6 +172,7 @@ abstract final class NodexDestinations {
         patients,
         appointments,
         wards,
+        inventory,
         syncDiagnostics,
         aiGovernance,
         audit,
